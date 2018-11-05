@@ -12,6 +12,6 @@ COPY . /home/code
 WORKDIR /home/code
 
 # build everything inside the container
-RUN ant 
+RUN mkdir -p bin && ant 
 
 CMD /bin/bash 

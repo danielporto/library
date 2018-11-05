@@ -48,23 +48,23 @@ services:
         - INSERTSTART=5000 
         - INSERTCOUNT=5000
 
-    client1:
-        image: bftsmart
-        command: sh -c 'sleep 120 && sh runscripts/ycsbClientEnv.sh'
-        environment:
-        - THREADS=1
-        - JAVA_OPTS=-XX:+UseG1GC
-        - RECORDCOUNT=10000
-        - CLIENTID=1000
-        - EXECUTION_TIME=300
+    # client1:
+    #     image: bftsmart
+    #     command: sh -c 'sleep 300 && sh runscripts/ycsbClientEnv.sh'
+    #     environment:
+    #     - THREADS=1
+    #     - JAVA_OPTS=-XX:+UseG1GC
+    #     - RECORDCOUNT=10000
+    #     - CLIENTID=1000
+    #     - EXECUTION_TIME=300
 
-    client1:
-        image: bftsmart
-        command: sh -c 'sleep 120 && sh runscripts/ycsbClientEnv.sh'
-        environment:
-        - THREADS=1
-        - JAVA_OPTS=-XX:+UseG1GC
-        - RECORDCOUNT=10000
-        - CLIENTID=2000
-        - EXECUTION_TIME=300
+    # client1:
+    #     image: bftsmart
+    #     command: sh -c 'sleep 300 && sh runscripts/ycsbClientEnv.sh'
+    #     environment:
+    #     - THREADS=1
+    #     - JAVA_OPTS=-XX:+UseG1GC
+    #     - RECORDCOUNT=10000
+    #     - CLIENTID=2000
+    #     - EXECUTION_TIME=300
 

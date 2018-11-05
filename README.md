@@ -92,6 +92,43 @@ Keys are stored in the `config/keys` folder. The command above creates key pairs
 
 Make sure that you have Ant installed and simply type `ant` in the main directory. The jar file is stored in the `bin/` directory.
 
+
+## Building and running BFTSMaRt in containers 
+### Requirements:
+    * docker and docker-compose installed (tested with docker 18.06 and compose 1.22)
+
+### YCSB with a single loader
+
+```$ docker-compose up```
+
+### YCSB with multiple  loaders
+
+```$ docker-compose -f docker-compose-multiloader.yml up --build```
+
+## Deploy the current source code to remote machines using ansible 
+
+### Requirements:
+    * 5 machines (4 servers and 1 client)
+    * username and ssh keys to remote nodes
+    * remote nodes should have python (latest) installed.
+
+#### Install the ansible galaxy role to allow managing JDK at the remote nodes:
+
+```$ ansible-galaxy install comcast.sdkman```
+
+#### Copy the content of the inventory_template.cfg to inventory.cfg and update its content.
+
+```$ cp inventory_template.cfg inventory.cfg```
+
+#### Deploy using the playbooks
+
+```$ ansible-playbook playbook/deploy-jdk.yml```
+```$ ansible-playbook playbook/deploy-bftsmart.yml```
+
+#### Cleanup:
+```$ ansible-playbook playbook/wipe-deployment```
+
+
 ## Additional information and publications
 
 If you are interested in learning more about BFT-SMaRt, you can read:

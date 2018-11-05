@@ -3,3 +3,6 @@ config/currentView
 test
 bin/BFT-SMaRt.jar
 .idea*
+config/*.iml
+*.iml
+inventory.cfg

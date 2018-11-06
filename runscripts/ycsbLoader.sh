@@ -14,8 +14,12 @@
 # limitations under the License.
 
 
-# to use this script, change the config/workloads/workloada accordingly to match the number of records desired
-# then, to run the experiment make sure that workloada has the proportion of operations (read/update) set
-# correctly
+# Change the config/workloads/workloada accordingly to match the number of records you wish to preload.
+# Then, make sure that workloada has the proportion of operations (read/update) set
+# correctly to run the experiment (i.e. start the clients) 
+if [ -n "$RECORDCOUNT" ];    then echo "recordcount=${RECORDCOUNT}" >> config/workloads/workloada ;  fi;
+if [ -n "$CLIENTID" ];       then echo "smart-initkey=${CLIENTID}" >> config/workloads/workloada ;  fi;
+if [ -n "$INSERTSTART" ];       then echo "insertstart=${INSERTSTART}" >> config/workloads/workloada ;  fi;
+if [ -n "$INSERTCOUNT" ];       then echo "insertcount=${INSERTCOUNT}" >>config/workloads/workloada;  fi;
 
-java -Dlogback.configurationFile="./config/logback.xml" -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada -p measurementtype=timeseries -p timeseries.granularity=1000 -db bftsmart.demo.ycsb.YCSBClient -s
+java ${JAVA_OPTS} -Dlogback.configurationFile="./config/logback.xml" -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada -p measurementtype=timeseries -p timeseries.granularity=1000 -db bftsmart.demo.ycsb.YCSBClient -s

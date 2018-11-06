@@ -25,4 +25,4 @@ echo "insertstart=${INSERTSTART}" >> config/workloads/workloada
 echo "insertcount=${INSERTCOUNT}" >>config/workloads/workloada
 
 
-java -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada  -db bftsmart.demo.ycsb.YCSBClient -s
+java -Dlogback.configurationFile="./config/logback.xml" -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada -p measurementtype=timeseries -p timeseries.granularity=1000 -db bftsmart.demo.ycsb.YCSBClient -s

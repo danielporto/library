@@ -18,4 +18,4 @@
 # then, to run the experiment make sure that workloada has the proportion of operations (read/update) set
 # correctly
 
-java -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada  -db bftsmart.demo.ycsb.YCSBClient -s
+java -Dlogback.configurationFile="./config/logback.xml" -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada -p measurementtype=timeseries -p timeseries.granularity=1000 -db bftsmart.demo.ycsb.YCSBClient -s

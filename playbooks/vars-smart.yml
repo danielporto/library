@@ -6,7 +6,7 @@ root_install_dir: /home/dporto/kaioken
 bftsmart_install_dir: "{{root_install_dir}}/bftsmart"
 
 sdkman_folder: "{{ root_install_dir }}/sdkman"
-java_version: '8.0.181-zulu'
+java_version: '8.0.201-zulu'
 ant_version: '1.10.1'
 
 #---------------------------------------------------------------------------
@@ -15,7 +15,7 @@ ant_version: '1.10.1'
 experiment_duration: 600
 warmup_duration: 30
 
-result_tree_root: "{{ default_install_dir }}/data"
+result_tree_root: "{{ root_install_dir }}/data"
 base_result_dir: "{{ result_tree_root }}/{{experiment_type}}/centos7/{{ experiment }}"
 
 #---------------------------------------------------------------------------

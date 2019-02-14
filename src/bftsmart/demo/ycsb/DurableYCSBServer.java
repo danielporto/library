@@ -18,19 +18,20 @@ package bftsmart.demo.ycsb;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.durability.DurabilityCoordinator;
-
 import java.io.*;
 import java.util.TreeMap;
 
+
 /**
  *
- * @author Marcel Santos
+ * @author Daniel Porto
  *
  */
 public class DurableYCSBServer extends DurabilityCoordinator {
 
     private static final boolean _debug = false;
     private TreeMap<String, YCSBTable> mTables;
+    private int myid;
 
     private boolean logPrinted = false;
 
@@ -43,6 +44,7 @@ public class DurableYCSBServer extends DurabilityCoordinator {
     }
 
     private DurableYCSBServer(int id) {
+        myid = id;
         this.mTables = new TreeMap<>();
         new ServiceReplica(id, this, this);
     }
@@ -154,6 +156,8 @@ public class DurableYCSBServer extends DurabilityCoordinator {
             mTables = (TreeMap<String, YCSBTable>) in.readObject();
             in.close();
             bis.close();
+            System.out.println("Replica " + this.myid  + " state size: " + this.mTables.size());
+//            System.out.println(mTables.toString());
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("[ERROR] Error deserializing state: "
                     + e.getMessage());

@@ -19,6 +19,8 @@
 if [ -n "$RECORDCOUNT" ];    then echo "recordcount=${RECORDCOUNT}" >> config/workloads/workloada ;  fi;
 if [ -n "$CLIENTID" ];       then echo "smart-initkey=${CLIENTID}" >> config/workloads/workloada ;  fi;
 if [ -n "$EXECUTION_TIME" ]; then echo "maxexecutiontime=${EXECUTION_TIME}" >> config/workloads/workloada ;  fi;
+if [ -n "$OPERATIONS" ]; then echo "operationcount=${OPERATIONS}" >> config/workloads/workloada ;  fi;
+
 if [ -z "$THREADS" ]; then THREADS=10;  fi;
 
 java ${JAVA_OPTS} -Dlogback.configurationFile="./config/logback.xml" -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -threads ${THREADS} -P config/workloads/workloada -p measurementtype=timeseries -p timeseries.granularity=1000 -db bftsmart.demo.ycsb.YCSBClient -s 

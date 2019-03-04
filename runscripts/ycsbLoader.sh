@@ -21,5 +21,8 @@ if [ -n "$RECORDCOUNT" ];    then echo "recordcount=${RECORDCOUNT}" >> config/wo
 if [ -n "$CLIENTID" ];       then echo "smart-initkey=${CLIENTID}" >> config/workloads/workloada ;  fi;
 if [ -n "$INSERTSTART" ];       then echo "insertstart=${INSERTSTART}" >> config/workloads/workloada ;  fi;
 if [ -n "$INSERTCOUNT" ];       then echo "insertcount=${INSERTCOUNT}" >>config/workloads/workloada;  fi;
+# if [ -n "$EXECUTION_TIME" ]; then echoq "maxexecutiontime=${EXECUTION_TIME}" >> config/workloads/workloada ;  fi;
+if [ -n "$OPERATIONS" ]; then echo "operationcount=${OPERATIONS}" >> config/workloads/workloada ;  fi;
+
 
 java ${JAVA_OPTS} -Dlogback.configurationFile="./config/logback.xml" -cp ./lib/*:./bin/ com.yahoo.ycsb.Client -load -P config/workloads/workloada -p measurementtype=timeseries -p timeseries.granularity=1000 -db bftsmart.demo.ycsb.YCSBClient -s

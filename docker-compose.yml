@@ -1,1 +1,1 @@
-dockerfiles/docker-compose-counter.yml
+dockerfiles/docker-compose-ycsb-durable.yml

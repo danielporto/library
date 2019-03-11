@@ -156,8 +156,8 @@ public class DurableYCSBServer extends DurabilityCoordinator {
             mTables = (TreeMap<String, YCSBTable>) in.readObject();
             in.close();
             bis.close();
-            System.out.println("Replica " + this.myid  + " state size: " + this.mTables.size());
-//            System.out.println(mTables.toString());
+            System.out.println("Replica "+ this.myid  +" state size: " +mTables.size());
+            // System.out.println(mTables.toString());
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("[ERROR] Error deserializing state: "
                     + e.getMessage());

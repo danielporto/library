@@ -21,6 +21,9 @@ import bftsmart.tom.server.durability.DurabilityCoordinator;
 
 import java.io.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Example replica that implements a BFT replicated service (a counter).
  * If the increment > 0 the counter is incremented, otherwise, the counter
@@ -33,9 +36,13 @@ public final class DurableCounterServer extends DurabilityCoordinator  {
 
     private int counter = 0;
     private int iterations = 0;
+    private int myid;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     public DurableCounterServer(int id) {
-    	new ServiceReplica(id, this, this);
+        myid = id;
+        new ServiceReplica(id, this, this);
     }
             
     @Override
@@ -99,6 +106,8 @@ public final class DurableCounterServer extends DurabilityCoordinator  {
             counter = in.readInt();
             in.close();
             bis.close();
+            logger.debug("Replica "+ this.myid  +" state :["+counter+"]");
+
         } catch (IOException e) {
             System.err.println("[ERROR] Error deserializing state: "
                     + e.getMessage());

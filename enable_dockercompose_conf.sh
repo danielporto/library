@@ -44,9 +44,9 @@ if [ ${c} == 'ycsb' -a ${l} == 'single' -a ${d} == 'yes'  ]; then
     echo "Configuration written."
 elif [ ${c} == 'ycsb' -a ${l} == 'single'  -a ${d} == 'no'  ]; then
     echo "ycsb, single and memory."
-    # cp dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml
-    echo "Not yet implemented."
-
+    rm docker-compose.yml
+    ln -s  dockerfiles/docker-compose-ycsb.yml docker-compose.yml
+    echo "Configuration written."
 elif [ ${c} == 'ycsb' -a ${l} == 'multi'  -a ${d} == 'yes'  ]; then
     echo "ycsb, multi and durable."
     # cp dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml

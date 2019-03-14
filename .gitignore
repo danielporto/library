@@ -5,3 +5,4 @@ test
 config/*.iml
 *.iml
 inventory.cfg
+docker-compose.yml

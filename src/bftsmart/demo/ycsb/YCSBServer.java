@@ -27,7 +27,10 @@ import java.util.TreeMap;
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.ServiceReplica;
 import bftsmart.tom.server.defaultservices.DefaultRecoverable;
-import bftsmart.tom.util.Logger;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,6 +43,7 @@ public class YCSBServer extends DefaultRecoverable {
     private TreeMap<String, YCSBTable> mTables;
 
     private boolean logPrinted = false;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static void main(String[] args) throws Exception {
         if (args.length == 1) {
@@ -60,7 +64,7 @@ public class YCSBServer extends DefaultRecoverable {
         int index = 0;
         for (byte[] command : commands) {
             if (msgCtx != null && msgCtx[index] != null && msgCtx[index].getConsensusId() % 1000 == 0 && !logPrinted) {
-                Logger.println("YCSBServer executing CID: " + msgCtx[index].getConsensusId());
+                logger.info("YCSBServer executing CID: " + msgCtx[index].getConsensusId());
                 logPrinted = true;
             } else {
                 logPrinted = false;
@@ -73,7 +77,7 @@ public class YCSBServer extends DefaultRecoverable {
                 continue;
             }
             if (_debug) {
-                Logger.println("[INFO] Processing an ordered request");
+                logger.debug("[INFO] Processing an ordered request");
             }
             switch (aRequest.getType()) {
                 case CREATE: { // ##### operation: create #####
@@ -109,7 +113,7 @@ public class YCSBServer extends DefaultRecoverable {
                 }
             }
             if (_debug) {
-                Logger.println("[INFO] Sending reply");
+                logger.debug("[INFO] Sending reply");
             }
             replies[index++] = reply.getBytes();
         }
@@ -125,7 +129,7 @@ public class YCSBServer extends DefaultRecoverable {
             return reply.getBytes();
         }
         if (_debug) {
-            Logger.println("[INFO] Processing an unordered request");
+            logger.debug("[INFO] Processing an unordered request");
         }
 
         switch (aRequest.getType()) {
@@ -147,7 +151,7 @@ public class YCSBServer extends DefaultRecoverable {
             }
         }
         if (_debug) {
-            Logger.println("[INFO] Sending reply");
+            logger.debug("[INFO] Sending reply");
         }
         return reply.getBytes();
     }
@@ -156,14 +160,14 @@ public class YCSBServer extends DefaultRecoverable {
     @Override
     public void installSnapshot(byte[] state) {
         try {
-            Logger.println("setState called");
+            logger.info("setState called");
             ByteArrayInputStream bis = new ByteArrayInputStream(state);
             ObjectInput in = new ObjectInputStream(bis);
             mTables = (TreeMap<String, YCSBTable>) in.readObject();
             in.close();
             bis.close();
         } catch (IOException | ClassNotFoundException e) {
-            Logger.println("[ERROR] Error deserializing state: "
+            logger.error("[ERROR] Error deserializing state: "
                     + e.getMessage());
         }
     }
@@ -171,7 +175,7 @@ public class YCSBServer extends DefaultRecoverable {
     @Override
     public byte[] getSnapshot() {
         try {
-            Logger.println("getState called");
+            logger.info("getState called");
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutput out = new ObjectOutputStream(bos);
             out.writeObject(mTables);
@@ -181,7 +185,7 @@ public class YCSBServer extends DefaultRecoverable {
             bos.close();
             return bos.toByteArray();
         } catch (IOException ioe) {
-            Logger.println("[ERROR] Error serializing state: "
+            logger.error("[ERROR] Error serializing state: "
                     + ioe.getMessage());
             return "ERROR".getBytes();
         }

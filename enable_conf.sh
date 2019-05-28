@@ -41,6 +41,8 @@ if [ ${c} == 'ycsb' -a ${l} == 'single' -a ${d} == 'yes'  ]; then
     echo "ycsb, single and durable."
     rm docker-compose.yml
     ln -s dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml
+    rm config/system.config
+    cp config/system.config.durable config/system.config
     echo "Configuration written."
 elif [ ${c} == 'ycsb' -a ${l} == 'single'  -a ${d} == 'no'  ]; then
     echo "ycsb, single and memory."
@@ -50,6 +52,8 @@ elif [ ${c} == 'ycsb' -a ${l} == 'single'  -a ${d} == 'no'  ]; then
 elif [ ${c} == 'ycsb' -a ${l} == 'multi'  -a ${d} == 'yes'  ]; then
     echo "ycsb, multi and durable."
     # cp dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml
+#    rm config/system.config
+#    cp config/system.config.durable config/system.config
     echo "Not yet implemented."
 
 elif [ ${c} == 'ycsb' -a ${l} == 'multi'  -a ${d} == 'no'  ]; then
@@ -60,15 +64,22 @@ elif [ ${c} == 'ycsb' -a ${l} == 'multi'  -a ${d} == 'no'  ]; then
 elif [ ${c} == 'counter' -a ${l} == 'single' -a ${d} == 'yes'  ]; then
     echo "counter, single and durable."
     # cp dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml
+#    rm config/system.config
+#    cp config/system.config.durable config/system.config
     echo "Not yet implemented."
 
 elif [ ${c} == 'counter' -a ${l} == 'single'  -a ${d} == 'no'  ]; then
     echo "counter, single and memory."
-    # cp dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml
-    echo "Not yet implemented."
+    rm docker-compose.yml
+    ln -s dockerfiles/docker-compose-counter.yml docker-compose.yml
+    rm config/system.config
+    cp config/system.config.default config/system.config
+    echo "Configuration written."
 elif [ ${c} == 'counter' -a ${l} == 'multi'  -a ${d} == 'yes'  ]; then
     echo "counter, multi and durable."
     # cp dockerfiles/docker-compose-ycsb-durable.yml docker-compose.yml
+#    rm config/system.config
+#    cp config/system.config.durable config/system.config
     echo "Not yet implemented."
 elif [ ${c} == 'counter' -a ${l} == 'multi'  -a ${d} == 'no'  ]; then
     echo "counter, multi and memory."

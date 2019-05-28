@@ -1194,6 +1194,7 @@ public class Synchronizer {
             if (iAmLeader) {
                 logger.debug("Waking up proposer thread");
                 tom.imAmTheLeader();
+                logger.info("I am the new leader: "+this.controller.getStaticConf().getProcessId());
             } // waik up the thread that propose values in normal operation
 
             // send a WRITE/ACCEPT message to the other replicas

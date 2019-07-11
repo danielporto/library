@@ -1,0 +1,61 @@
+version: '3'
+                            
+# runscripts/smartrun.sh bftsmart.demo.microbenchmark.ThroughputLatencyServer
+# <processId> - replica id, starts from 0 up to n-1
+# <measurement interval> in ms, typically 1s:  1000 
+# <reply size>  in bytes, typically 1kB:  1000
+# <state size> kept in memory, not exchanged nor used, in bytes, typically 1kB: 1000  
+# <context?> - print more info, typically: true  
+# <nosig | default | ecdsa>  use signatures typically: default  
+# [rwd | rw]") persist on the dis, typically none or for durable 'rwd'.  
+
+services:
+    r0:
+        image: bftsmart
+        build: .
+        restart: always
+        command: sh -c 'sleep 1 && ls config && sh runscripts/smartrun.sh bftsmart.demo.microbenchmarks.ThroughputLatencyServer 0 1 1000 1000 true default'
+        # environment:
+        # - JAVA_OPTS=-Xms2G -XX:+UseG1GC
+
+    r1:
+        image: bftsmart
+        restart: always
+        command: sh -c 'sleep 5 && sh runscripts/smartrun.sh bftsmart.demo.microbenchmarks.ThroughputLatencyServer 1 1 1000 1000 true default'
+        environment:
+        - JAVA_OPTS=-XX:+UseG1GC
+
+    r2:
+        image: bftsmart
+        restart: always
+        command: sh -c 'sleep 10 && sh runscripts/smartrun.sh bftsmart.demo.microbenchmarks.ThroughputLatencyServer 2 1 1000 1000 true default'
+        environment:
+        - JAVA_OPTS=-XX:+UseG1GC
+        
+    r3:
+        image: bftsmart
+        restart: always
+        command: sh -c 'sleep 15 && sh runscripts/smartrun.sh bftsmart.demo.microbenchmarks.ThroughputLatencyServer 3 1 1000 1000 true default'        # command: sh -c 'sleep 15 && sh runscripts/smartrun.sh bftsmart.demo.microbenchmark.ThroughputLatencyServer 3 1000 1000 1000 true default rwd'
+        environment:
+        - JAVA_OPTS=-XX:+UseG1GC
+
+
+
+# runscripts/smartrun.sh bftsmart.demo.microbenchmark.ThroughputLatencyClient 
+# <initial client id> 
+# <number of clients>
+# <number of operations>  qty
+# <request size>  in bytes, typically 1000
+# <interval (ms)> 1000
+# <read only?> false
+# <verbose?> false
+# <nosig | default | ecdsa> default
+
+    client0:
+        image: bftsmart
+        command: sh -c 'sleep 20 && sh runscripts/smartrun.sh bftsmart.demo.microbenchmarks.ThroughputLatencyClient 1001 1 500 1000 1000 false false default'
+
+    # client2:
+    #     image: bftsmart
+    #     command: sh -c 'sleep 20 && sh runscripts/smartrun.sh bftsmart.demo.microbenchmark.ThroughputLatencyClient 2001 1 1000'
+

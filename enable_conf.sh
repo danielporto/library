@@ -1,12 +1,12 @@
 #!/bin/bash
 
 usage() { 
-    echo "Usage: $0 [-c <ycsb|counter|bench>] [-l <single|multi>] [-d <yes|no>]" 1>&2; 
-    echo "Where 'c' is a short for configuration, 'l' for type of loader and 'd' indicates if durable or not."
+    echo "Usage: $0 [-c <ycsb|counter|bench>] [-l <single|multi>] [-d <yes|no>] [-L <default|async>]" 1>&2;
+    echo "Where 'c' is a short for configuration, 'l' for type of loader and 'd' indicates if durable or not and L activate default logging or log async."
     exit 1; 
 }
 
-while getopts ":c:l:d:" o; do
+while getopts ":c:l:d:L:" o; do
     case "${o}" in
         c)
             c=${OPTARG}
@@ -20,6 +20,10 @@ while getopts ":c:l:d:" o; do
             d=${OPTARG}
             ((d == 'yes' || d == 'no')) || usage
             ;;
+        L)
+            L=${OPTARG}
+            ((L == 'default' || L == 'async')) || usage
+            ;;
 
         *)
             usage
@@ -28,10 +32,20 @@ while getopts ":c:l:d:" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${c}" ] || [ -z "${l}" ] || [ -z "${d}" ]; then
+if [ -z "${c}" ] || [ -z "${l}" ] || [ -z "${d}" ] || [ -z "${L}" ]; then
     usage
     exit
 fi
+
+logging() {
+    if [ "${L}" == 'async' ] ; then
+        cp config/logback.xml.logging config/logback.xml
+        echo "Logging updated - async conf"
+    else
+        cp config/logback.xml.default config/logback.xml
+        echo "Logging updated - default conf"
+    fi
+}
 
 # echo "s = ${c}"
 # echo "p = ${l}"
@@ -41,7 +55,9 @@ cleanup() {
     rm -f config/system.config
     rm -f config/currentView
     echo "Configuration clean."
+    logging
 }
+
 
 
 configure_ycsb() {

@@ -1,0 +1,35 @@
+<configuration debug="false">
+
+  <!-- Logging to console with json format output -->
+  <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
+      <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+          <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+              <!-- <prettyPrint>true</prettyPrint> -->
+          </jsonFormatter>
+          <appendLineSeparator>true</appendLineSeparator>
+      </layout>
+  </appender>
+
+  <!-- Logging asynchronously
+      https://logback.qos.ch/manual/appenders.html#AsyncAppender
+      http://blog.takipi.com/how-to-instantly-improve-your-java-logging-with-7-logback-tweaks/
+   -->
+  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="json" />
+    <queueSize>1000</queueSize>
+  </appender>
+
+
+  <root level="ERROR"></root>
+
+  <logger name="bftsmart" level="INFO">
+      <appender-ref ref="ASYNC" />
+  </logger>
+
+  <logger name="io.netty" level="ERROR">
+      <appender-ref ref="ASYNC" />
+  </logger>
+
+
+
+</configuration>

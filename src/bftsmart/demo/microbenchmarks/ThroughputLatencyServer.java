@@ -43,14 +43,15 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple server that just acknowledge the reception of a request.
  */
 public final class ThroughputLatencyServer extends DefaultRecoverable{
-    
+    private static Logger logger = LoggerFactory.getLogger(ThroughputLatencyServer.class);
     private int interval;
     private byte[] reply;
     private float maxTp = -1;
@@ -119,7 +120,7 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
                     }
                 });
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error(ex.getMessage());
                 System.exit(0);
             }
         }
@@ -159,13 +160,13 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
                 channel.write(bb);
                 channel.force(false);
             } catch (IOException ex) {
-                Logger.getLogger(ThroughputLatencyServer.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
                 
             } finally {
                 try {
                     oos.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(ThroughputLatencyServer.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
             }
         }
@@ -213,7 +214,7 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
                 eng.update(request);
                 if (!eng.verify(signature)) {
                     
-                    System.out.println("Client sent invalid signature!");
+                    logger.error("Client sent invalid signature!");
                     System.exit(0);
                 }
             }
@@ -278,32 +279,32 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
         
         float tp = -1;
         if(iterations % interval == 0) {
-            if (context) System.out.println("--- (Context)  iterations: "+ iterations + " // regency: " + msgCtx.getRegency() + " // consensus: " + msgCtx.getConsensusId() + " ---");
+            if (context) logger.info("--- (Context)  iterations: "+ iterations + " // regency: " + msgCtx.getRegency() + " // consensus: " + msgCtx.getConsensusId() + " ---");
             
-            System.out.println("--- Measurements after "+ iterations+" ops ("+interval+" samples) ---");
+            logger.info("--- Measurements after "+ iterations+" ops ("+interval+" samples) ---");
             
             tp = (float)(interval*1000/(float)(System.currentTimeMillis()-throughputMeasurementStartTime));
             
             if (tp > maxTp) maxTp = tp;
             
-            System.out.println("Throughput = " + tp +" operations/sec (Maximum observed: " + maxTp + " ops/sec)");            
+            logger.info("Throughput = " + tp +" operations/sec (Maximum observed: " + maxTp + " ops/sec)");            
             
-            System.out.println("Total latency = " + totalLatency.getAverage(false) / 1000 + " (+/- "+ (long)totalLatency.getDP(false) / 1000 +") us ");
+            logger.info("Total latency = " + totalLatency.getAverage(false) / 1000 + " (+/- "+ (long)totalLatency.getDP(false) / 1000 +") us ");
             totalLatency.reset();
-            System.out.println("Consensus latency = " + consensusLatency.getAverage(false) / 1000 + " (+/- "+ (long)consensusLatency.getDP(false) / 1000 +") us ");
+            logger.info("Consensus latency = " + consensusLatency.getAverage(false) / 1000 + " (+/- "+ (long)consensusLatency.getDP(false) / 1000 +") us ");
             consensusLatency.reset();
-            System.out.println("Pre-consensus latency = " + preConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)preConsLatency.getDP(false) / 1000 +") us ");
+            logger.info("Pre-consensus latency = " + preConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)preConsLatency.getDP(false) / 1000 +") us ");
             preConsLatency.reset();
-            System.out.println("Pos-consensus latency = " + posConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)posConsLatency.getDP(false) / 1000 +") us ");
+            logger.info("Pos-consensus latency = " + posConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)posConsLatency.getDP(false) / 1000 +") us ");
             posConsLatency.reset();
-            System.out.println("Propose latency = " + proposeLatency.getAverage(false) / 1000 + " (+/- "+ (long)proposeLatency.getDP(false) / 1000 +") us ");
+            logger.info("Propose latency = " + proposeLatency.getAverage(false) / 1000 + " (+/- "+ (long)proposeLatency.getDP(false) / 1000 +") us ");
             proposeLatency.reset();
-            System.out.println("Write latency = " + writeLatency.getAverage(false) / 1000 + " (+/- "+ (long)writeLatency.getDP(false) / 1000 +") us ");
+            logger.info("Write latency = " + writeLatency.getAverage(false) / 1000 + " (+/- "+ (long)writeLatency.getDP(false) / 1000 +") us ");
             writeLatency.reset();
-            System.out.println("Accept latency = " + acceptLatency.getAverage(false) / 1000 + " (+/- "+ (long)acceptLatency.getDP(false) / 1000 +") us ");
+            logger.info("Accept latency = " + acceptLatency.getAverage(false) / 1000 + " (+/- "+ (long)acceptLatency.getDP(false) / 1000 +") us ");
             acceptLatency.reset();
             
-            System.out.println("Batch average size = " + batchSize.getAverage(false) + " (+/- "+ (long)batchSize.getDP(false) +") requests");
+            logger.info("Batch average size = " + batchSize.getAverage(false) + " (+/- "+ (long)batchSize.getDP(false) +") requests");
             batchSize.reset();
             
             throughputMeasurementStartTime = System.currentTimeMillis();
@@ -314,7 +315,7 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
 
     public static void main(String[] args){
         if(args.length < 6) {
-            System.out.println("Usage: ... ThroughputLatencyServer <processId> <measurement interval> <reply size> <state size> <context?> <nosig | default | ecdsa> [rwd | rw]");
+            logger.info("Usage: ... ThroughputLatencyServer <processId> <measurement interval> <reply size> <state size> <context?> <nosig | default | ecdsa> [rwd | rw]");
             System.exit(-1);
         }
 
@@ -333,7 +334,7 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
         
         if (s == 2 && Security.getProvider("SunEC") == null) {
             
-            System.out.println("Option 'ecdsa' requires SunEC provider to be available.");
+            logger.error("Option 'ecdsa' requires SunEC provider to be available.");
             System.exit(0);
         }
         

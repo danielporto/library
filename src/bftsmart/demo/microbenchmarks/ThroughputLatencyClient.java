@@ -20,6 +20,9 @@ import java.io.IOException;
 import bftsmart.tom.ServiceProxy;
 import bftsmart.tom.util.Storage;
 import bftsmart.tom.util.TOMUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -44,6 +47,7 @@ import java.util.concurrent.Future;
  *
  */
 public class ThroughputLatencyClient {
+    private static Logger logger = LoggerFactory.getLogger(ThroughputLatencyClient.class);
 
     public static int initId = 0;
     
@@ -87,7 +91,7 @@ public class ThroughputLatencyClient {
         
         if (s == 2 && Security.getProvider("SunEC") == null) {
             
-            System.out.println("Option 'ecdsa' requires SunEC provider to be available.");
+            logger.error("Option 'ecdsa' requires SunEC provider to be available.");
             System.exit(0);
         }
 
@@ -101,7 +105,7 @@ public class ThroughputLatencyClient {
                 ex.printStackTrace();
             }
             
-            System.out.println("Launching client " + (initId+i));
+            logger.info("Launching client " + (initId+i));
             clients[i] = new ThroughputLatencyClient.Client(initId+i,numberOfOps,requestSize,interval,readOnly, verbose, s);
         }
 
@@ -125,7 +129,7 @@ public class ThroughputLatencyClient {
     
         exec.shutdown();
 
-        System.out.println("All clients done.");
+        logger.info("All clients done.");
     }
 
     static class Client extends Thread {
@@ -195,45 +199,46 @@ public class ThroughputLatencyClient {
 
         public void run() {
             
-            System.out.println("Warm up...");
+            logger.info("Warm up...");
 
             int req = 0;
             
             for (int i = 0; i < numberOfOps / 2; i++, req++) {
-                if (verbose) System.out.print("Sending req " + req + "...");
+                if (verbose) logger.info("Sending req " + req + "...");
 
                 if(readOnly)
                         proxy.invokeUnordered(request);
                 else
                         proxy.invokeOrdered(request);
                         
-                if (verbose) System.out.println(" sent!");
+                if (verbose) logger.info(" sent!");
 
-                if (verbose && (req % 1000 == 0)) System.out.println(this.id + " // " + req + " operations sent!");
+                if (verbose && (req % 1000 == 0)) logger.info(this.id + " // " + req + " operations sent!");
 
 		if (interval > 0) {
                     try {
                         //sleeps interval ms before sending next request
                         Thread.sleep(interval);
                     } catch (InterruptedException ex) {
+                        logger.error(ex.getMessage());
                     }
                 }
             }
 
             Storage st = new Storage(numberOfOps / 2);
 
-            System.out.println("Executing experiment for " + numberOfOps / 2 + " ops");
+            logger.info("Executing experiment for " + numberOfOps / 2 + " ops");
 
             for (int i = 0; i < numberOfOps / 2; i++, req++) {
                 long last_send_instant = System.nanoTime();
-                if (verbose) System.out.print(this.id + " // Sending req " + req + "...");
+                if (verbose) logger.info(this.id + " // Sending req " + req + "...");
 
                 if(readOnly)
                         proxy.invokeUnordered(request);
                 else
                         proxy.invokeOrdered(request);
                         
-                if (verbose) System.out.println(this.id + " // sent!");
+                if (verbose) logger.info(this.id + " // sent!");
                 st.store(System.nanoTime() - last_send_instant);
 
                 if (interval > 0) {
@@ -241,18 +246,19 @@ public class ThroughputLatencyClient {
                         //sleeps interval ms before sending next request
                         Thread.sleep(interval);
                     } catch (InterruptedException ex) {
+                        logger.error(ex.getMessage());
                     }
                 }
                                 
-                if (verbose && (req % 1000 == 0)) System.out.println(this.id + " // " + req + " operations sent!");
+                if (verbose && (req % 1000 == 0)) logger.info(this.id + " // " + req + " operations sent!");
             }
 
             if(id == initId) {
-                System.out.println(this.id + " // Average time for " + numberOfOps / 2 + " executions (-10%) = " + st.getAverage(true) / 1000 + " us ");
-                System.out.println(this.id + " // Standard desviation for " + numberOfOps / 2 + " executions (-10%) = " + st.getDP(true) / 1000 + " us ");
-                System.out.println(this.id + " // Average time for " + numberOfOps / 2 + " executions (all samples) = " + st.getAverage(false) / 1000 + " us ");
-                System.out.println(this.id + " // Standard desviation for " + numberOfOps / 2 + " executions (all samples) = " + st.getDP(false) / 1000 + " us ");
-                System.out.println(this.id + " // Maximum time for " + numberOfOps / 2 + " executions (all samples) = " + st.getMax(false) / 1000 + " us ");
+                logger.info(this.id + " // Average time for " + numberOfOps / 2 + " executions (-10%) = " + st.getAverage(true) / 1000 + " us ");
+                logger.info(this.id + " // Standard desviation for " + numberOfOps / 2 + " executions (-10%) = " + st.getDP(true) / 1000 + " us ");
+                logger.info(this.id + " // Average time for " + numberOfOps / 2 + " executions (all samples) = " + st.getAverage(false) / 1000 + " us ");
+                logger.info(this.id + " // Standard desviation for " + numberOfOps / 2 + " executions (all samples) = " + st.getDP(false) / 1000 + " us ");
+                logger.info(this.id + " // Maximum time for " + numberOfOps / 2 + " executions (all samples) = " + st.getMax(false) / 1000 + " us ");
             }
             
             proxy.close();

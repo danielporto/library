@@ -39,10 +39,10 @@ fi
 
 logging() {
     if [ "${L}" == 'async' ] ; then
-        cp config/logback.xml.logging config/logback.xml
+        cp config/logback.asyncjson.xml config/logback.xml
         echo "Logging updated - async conf"
     else
-        cp config/logback.xml.default config/logback.xml
+        cp config/logback.default.xml config/logback.xml
         echo "Logging updated - default conf"
     fi
 }

@@ -40,10 +40,10 @@ fi
 logging() {
     if [ "${L}" == 'async' ] ; then
         cp config/logback.asyncjson.xml config/logback.xml
-        echo "Logging updated - async conf"
+        echo "Logging updated - async and json output configuration."
     else
         cp config/logback.default.xml config/logback.xml
-        echo "Logging updated - default conf"
+        echo "Logging updated - synchronous and plain output configuration."
     fi
 }
 

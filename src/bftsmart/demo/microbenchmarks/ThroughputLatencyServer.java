@@ -56,6 +56,7 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
     private byte[] reply;
     private float maxTp = -1;
     private boolean context;
+    private boolean inline = false;
     private int signed;
     
     private byte[] state;
@@ -78,11 +79,12 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
     private RandomAccessFile randomAccessFile = null;
     private FileChannel channel = null;
 
-    public ThroughputLatencyServer(int id, int interval, int replySize, int stateSize, boolean context,  int signed, int write) {
+    public ThroughputLatencyServer(int id, int interval, int replySize, int stateSize, boolean context, boolean inline, int signed, int write) {
 
         this.interval = interval;
         this.context = context;
         this.signed = signed;
+        this.inline = inline;
         
         this.reply = new byte[replySize];
         
@@ -287,26 +289,52 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
             
             if (tp > maxTp) maxTp = tp;
             
-            logger.info("Throughput = " + tp +" operations/sec (Maximum observed: " + maxTp + " ops/sec)");            
-            
-            logger.info("Total latency = " + totalLatency.getAverage(false) / 1000 + " (+/- "+ (long)totalLatency.getDP(false) / 1000 +") us ");
-            totalLatency.reset();
-            logger.info("Consensus latency = " + consensusLatency.getAverage(false) / 1000 + " (+/- "+ (long)consensusLatency.getDP(false) / 1000 +") us ");
-            consensusLatency.reset();
-            logger.info("Pre-consensus latency = " + preConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)preConsLatency.getDP(false) / 1000 +") us ");
-            preConsLatency.reset();
-            logger.info("Pos-consensus latency = " + posConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)posConsLatency.getDP(false) / 1000 +") us ");
-            posConsLatency.reset();
-            logger.info("Propose latency = " + proposeLatency.getAverage(false) / 1000 + " (+/- "+ (long)proposeLatency.getDP(false) / 1000 +") us ");
-            proposeLatency.reset();
-            logger.info("Write latency = " + writeLatency.getAverage(false) / 1000 + " (+/- "+ (long)writeLatency.getDP(false) / 1000 +") us ");
-            writeLatency.reset();
-            logger.info("Accept latency = " + acceptLatency.getAverage(false) / 1000 + " (+/- "+ (long)acceptLatency.getDP(false) / 1000 +") us ");
-            acceptLatency.reset();
-            
-            logger.info("Batch average size = " + batchSize.getAverage(false) + " (+/- "+ (long)batchSize.getDP(false) +") requests");
-            batchSize.reset();
-            
+            if (!inline){
+                logger.info("Throughput = " + tp +" operations/sec (Maximum observed: " + maxTp + " ops/sec)");                          
+                logger.info("Total latency = " + totalLatency.getAverage(false) / 1000 + " (+/- "+ (long)totalLatency.getDP(false) / 1000 +") us ");
+                totalLatency.reset();
+                logger.info("Consensus latency = " + consensusLatency.getAverage(false) / 1000 + " (+/- "+ (long)consensusLatency.getDP(false) / 1000 +") us ");
+                consensusLatency.reset();
+                logger.info("Pre-consensus latency = " + preConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)preConsLatency.getDP(false) / 1000 +") us ");
+                preConsLatency.reset();
+                logger.info("Pos-consensus latency = " + posConsLatency.getAverage(false) / 1000 + " (+/- "+ (long)posConsLatency.getDP(false) / 1000 +") us ");
+                posConsLatency.reset();
+                logger.info("Propose latency = " + proposeLatency.getAverage(false) / 1000 + " (+/- "+ (long)proposeLatency.getDP(false) / 1000 +") us ");
+                proposeLatency.reset();
+                logger.info("Write latency = " + writeLatency.getAverage(false) / 1000 + " (+/- "+ (long)writeLatency.getDP(false) / 1000 +") us ");
+                writeLatency.reset();
+                logger.info("Accept latency = " + acceptLatency.getAverage(false) / 1000 + " (+/- "+ (long)acceptLatency.getDP(false) / 1000 +") us ");
+                acceptLatency.reset();
+                logger.info("Batch average size = " + batchSize.getAverage(false) + " (+/- "+ (long)batchSize.getDP(false) +") requests");
+                batchSize.reset();
+            }
+            else{
+                double tl = totalLatency.getAverage(false)/1000;
+                double tldp = (long)totalLatency.getDP(false) / 1000;
+                totalLatency.reset();
+                double cl = consensusLatency.getAverage(false) / 1000;
+                double cldp = (long)consensusLatency.getDP(false) / 1000;
+                consensusLatency.reset();
+                double precl = preConsLatency.getAverage(false) / 1000;
+                double precldp = (long)preConsLatency.getDP(false) / 1000;
+                preConsLatency.reset();
+                double poscl = posConsLatency.getAverage(false) / 1000;
+                double poscldp = (long)posConsLatency.getDP(false) / 1000;
+                posConsLatency.reset();
+                double ppl = proposeLatency.getAverage(false) / 1000;
+                double ppldp = (long)proposeLatency.getDP(false) / 1000;
+                proposeLatency.reset();
+                double wl = writeLatency.getAverage(false) / 1000;
+                double wldp = (long)writeLatency.getDP(false) / 1000; 
+                writeLatency.reset();
+                double acl = acceptLatency.getAverage(false) / 1000;
+                double acldp = (long)acceptLatency.getDP(false) / 1000;
+                acceptLatency.reset();
+                double bsz = batchSize.getAverage(false);
+                double bszdp = (long)batchSize.getDP(false);
+                batchSize.reset();
+                logger.info(String.format("throughput %f ops/sec; max %f ops/sec; total_latency %f us; latency_std %f us; consensus_latency %f us; consensus_std %f us; preconsensus_latency %f us; preconsensus_latency_std %f us; posconsensus_latency %f us; posconsensus_latency_std %f us; propose_latency %f us; propose_latency_std %f us; write_latency %f us; write_latency_std %f us; accept_latency %f us; accept_latency_std %f us; batch_size %f reqs; batch_size_std %f reqs", tp, maxTp, tl, tldp, cl, cldp, precl, precldp, poscl, poscldp, ppl, ppldp, wl, wldp, acl, acldp, bsz, bszdp ));
+            }
             throughputMeasurementStartTime = System.currentTimeMillis();
         }
 
@@ -314,8 +342,8 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
     }
 
     public static void main(String[] args){
-        if(args.length < 6) {
-            logger.info("Usage: ... ThroughputLatencyServer <processId> <measurement interval> <reply size> <state size> <context?> <nosig | default | ecdsa> [rwd | rw]");
+        if(args.length < 7) {
+            logger.info("Usage: ... ThroughputLatencyServer <processId> <measurement interval> <reply size> <state size> <context?> <inline output> <nosig | default | ecdsa> [rwd | rw]");
             System.exit(-1);
         }
 
@@ -324,8 +352,9 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
         int replySize = Integer.parseInt(args[2]);
         int stateSize = Integer.parseInt(args[3]);
         boolean context = Boolean.parseBoolean(args[4]);
-        String signed = args[5];
-        String write = args.length > 6 ? args[6] : "";
+        boolean inline_output = Boolean.parseBoolean(args[5]);
+        String signed = args[6];
+        String write = args.length > 7 ? args[7] : "";
         
         int s = 0;
         
@@ -343,7 +372,7 @@ public final class ThroughputLatencyServer extends DefaultRecoverable{
         if (!write.equalsIgnoreCase("")) w++;
         if (write.equalsIgnoreCase("rwd")) w++;
 
-        new ThroughputLatencyServer(processId,interval,replySize, stateSize, context, s, w);        
+        new ThroughputLatencyServer(processId,interval,replySize, stateSize, context, inline_output, s, w);        
     }
 
     @Override
